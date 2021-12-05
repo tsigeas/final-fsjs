@@ -1,7 +1,7 @@
 const express = require("express");
 const UserDao = require("../data/UserDao");
 const ApiError = require("../model/ApiError");
-const { checkAdmin } = require("../util/middleware");
+const { checkAdmin, checkToken} = require("../util/middleware");
 
 const router = express.Router();
 const users = new UserDao();
@@ -25,9 +25,13 @@ router.get("/api/users", checkAdmin, async (req, res, next) => {
   }
 });
 
-router.get("/api/users/:id", checkAdmin, async (req, res, next) => {
+router.get("/api/users/:id", checkToken, async (req, res, next) => {
   try {
     const { id } = req.params;
+    const user = req.user;
+    if (req.user.role !== "ADMIN" || user.sub !== id) {
+      throw new ApiError(403, "Return 403 for unauthorized token");
+    }
     const data = await users.read(id);
     res.json({ data });
   } catch (err) {
@@ -45,7 +49,7 @@ router.post("/api/users", checkAdmin, async (req, res, next) => {
   }
 });
 
-router.delete("/api/users/:id", checkAdmin, async (req, res, next) => {
+router.delete("/api/users/:id", checkToken, async (req, res, next) => {
   try {
     const { id } = req.params;
     const data = await users.delete(id);
@@ -55,16 +59,19 @@ router.delete("/api/users/:id", checkAdmin, async (req, res, next) => {
   }
 });
 
-router.put("/api/users/:id", checkAdmin, async (req, res, next) => {
+router.put("/api/users/:id", checkToken, async (req, res, next) => {
   try {
     const { id } = req.params;
     const { password, role } = req.body;
     if (!password && !role) {
       throw new ApiError(400, "You must provide at least one user attribute!");
     }
+    if(req.user.role !== "ADMIN" && role) {
+      throw new ApiError(403, "Return 403 for unauthorized token");
+    }
     const data = await users.update(id, { password, role });
     res.json({ data });
-  } catch (err) {
+} catch (err) {
     next(err);
   }
 });
