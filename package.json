@@ -22,7 +22,7 @@
   "devDependencies": {
     "@shelf/jest-mongodb": "^2.1.0",
     "faker": "^5.5.3",
-    "jest": "^27.3.1",
+    "jest": "^27.4.3",
     "nodemon": "^2.0.15",
     "prettier": "^2.5.0",
     "supertest": "^6.1.6"
