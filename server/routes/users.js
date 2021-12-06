@@ -29,7 +29,7 @@ router.get("/api/users/:id", checkToken, async (req, res, next) => {
   try {
     const { id } = req.params;
     const user = req.user;
-    if (req.user.role !== "ADMIN" || user.sub !== id) {
+    if (req.user.role !== "ADMIN" && user.sub !== id) {
       throw new ApiError(403, "Return 403 for unauthorized token");
     }
     const data = await users.read(id);
@@ -52,6 +52,10 @@ router.post("/api/users", checkAdmin, async (req, res, next) => {
 router.delete("/api/users/:id", checkToken, async (req, res, next) => {
   try {
     const { id } = req.params;
+    const user = req.user;
+    if (req.user.role !== "ADMIN" && user.sub !== id) {
+      throw new ApiError(403, "Return 403 for unauthorized token");
+    }
     const data = await users.delete(id);
     res.json({ data });
   } catch (err) {

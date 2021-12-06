@@ -11,10 +11,10 @@ class OrderDao {
     // Hint: Total price is computer from the list of products.
 
     // check valid customer
-    if(customer === undefined) {
+    if(customer === undefined || customer === "") {
       throw new ApiError(400, "Return 400 for missing customer");
     }
-    if (products === undefined) {
+    if (products === undefined || products === "") {
       throw new ApiError(400, "Return 404 for non-existing product attribute");
     }
 
@@ -24,9 +24,13 @@ class OrderDao {
 
     let total = 0;
     products.forEach((product) => {
-      if (!mongoose.isValidObjectId(product.product)) {
+      if (!mongoose.isValidObjectId(product.product._id)) {
         throw new ApiError(404, "Return 404 for non-existing customer");
       }
+      if (!Number.isInteger(product.quantity)) {
+        throw new ApiError(400, "Return 400 for invalid quantity attribute");
+      }
+
       total += product.product.price * product.quantity;
     });
     
@@ -34,27 +38,28 @@ class OrderDao {
     
     return {
       _id: order._id.toString(),
+      status: order.status,
       total: order.total,
+      customer: order.customer,
       product: order.product,
     };
   }
-  // TODO delete this
-s
+
   async read(id, customer, role) {
     // Hint:
     //  If role==="ADMIN" then return the order for the given ID
     //  Otherwise, only return it if the customer is the one who placed the order!
+    if (role !== "ADMIN" && role !== "CUSTOMER") {
+      throw new ApiError(400, "Every user must have a valid role!");
+    }
+
     const order = await Order.findById(id).lean().select("-__v");
 
     if (order === null) {
       throw new ApiError(404, "Return 404 for invalid order ID");
     }
 
-    if (role !== "ADMIN" && role !== "CUSTOMER") {
-      throw new ApiError(400, "Every user must have a valid role!");
-    }
-
-    if (role !== "ADMIN" && customer._id !== id) {
+    if (role !== "ADMIN" && order.customer._id !== customer._id) {
       throw new ApiError(403, "Return 403 for unauthorized token");
     }
 
@@ -67,16 +72,10 @@ s
     // Hint:
     //  The customer and status parameters are filters.
     //  For example, one may search for all "ACTIVE" orders for the given customer.
-    let orders = await Order.find({}).lean().select("-__v");
+    if(customer) {
 
-    orders.filter((order) =>
-      order.customer === customer
-    );
-
-    orders.filter((order) =>
-      order.status === status
-    );
-
+    }
+    let orders = await Order.find({customer, status}).lean().select("-__v");
     return orders;
   }
 
