@@ -213,7 +213,7 @@ describe(`Test ${endpoint} endpoints`, () => {
           const response = await request
               .get(`${endpoint}?customer=${customer}&status=${status}`)
               .set("Authorization", `Bearer ${customerToken}`);
-          const expected = samples.filter((s) => (s.customer === customer) && (s.status === status)).length;
+          const expected = samples.filter((s) => (s.customer._id === customer._id) && (s.status === status)).length;
           expect(response.status).toBe(200);
           expect(response.body.data.length).toStrictEqual(expected);
         });
@@ -598,7 +598,7 @@ describe(`Test ${endpoint} endpoints`, () => {
             })
             .set("Authorization", `Bearer ${userToken}`);
         expect(response.status).toBe(200);
-        console.log(response.body.data);
+        expect(response.body.data._id).toBe(order._id);
         expect(response.body.data.total).toBe(186.18);
       });
 
@@ -610,6 +610,7 @@ describe(`Test ${endpoint} endpoints`, () => {
             })
             .set("Authorization", `Bearer ${userToken}`);
         expect(response.status).toBe(200);
+        expect(response.body.data._id).toBe(order._id);
         expect(response.body.data.status).toBe("COMPLETE");
       });
     });
@@ -683,6 +684,7 @@ describe(`Test ${endpoint} endpoints`, () => {
       const response = await request
           .delete(`${endpoint}/${samples[0]._id}`)
           .set("Authorization", `Bearer ${token}`);
+      expect(response.body.data._id).toBe(samples[0]._id);
       expect(response.status).toBe(200);
     });
   });
