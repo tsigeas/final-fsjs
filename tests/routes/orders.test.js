@@ -147,9 +147,9 @@ describe(`Test ${endpoint} endpoints`, () => {
         expect(response.body.data.length).toBe(samples.length);
       });
 
-      // test("Customer can see their orders", async () => {
-      //   // TODO Implement me!;
-      // });
+      test("Customer can see their orders", async () => {
+
+      });
     });
 
     describe(`Test GET ${endpoint} with query parameter`, () => {
@@ -206,7 +206,7 @@ describe(`Test ${endpoint} endpoints`, () => {
           const customer = samples[1].customer;
           const customerToken = await createToken(customer);
           const response = await request
-              .get(`${endpoint}?customer=${customer}?status=${status}`)
+              .get(`${endpoint}?customer=${customer}&status=${status}`)
               .set("Authorization", `Bearer ${customerToken}`);
           const expected = samples.filter((s) => (s.customer === customer) && (s.status === status)).length;
           expect(response.status).toBe(200);
@@ -219,7 +219,7 @@ describe(`Test ${endpoint} endpoints`, () => {
           const customer = samples[1].customer;
           const customerToken = await createToken(customer);
           const response = await request
-              .get(`${endpoint}?customer=${customer}?status=${status}`)
+              .get(`${endpoint}?customer=${customer}&status=${status}`)
               .set("Authorization", `Bearer ${customerToken}`);
           const expected = samples.filter((s) => (s.customer === customer) && (s.status === status)).length;
           expect(response.status).toBe(200);
@@ -239,7 +239,6 @@ describe(`Test ${endpoint} endpoints`, () => {
       });
 
       test("Return 200 and an empty list for orders with invalid status query", async () => {
-        // TODO Implement me!
         const status = "non-existing-status";
         const response = await request
             .get(`${endpoint}?status=${status}`)
@@ -279,7 +278,6 @@ describe(`Test ${endpoint} endpoints`, () => {
       userToken = await createToken(user);
     });
     test("Return 404 for invalid order ID", async () => {
-      // TODO Implement me!
       const id = mongoose.Types.ObjectId().toString();
       const response = await request
           .get(`${endpoint}/${id}`)
@@ -288,14 +286,12 @@ describe(`Test ${endpoint} endpoints`, () => {
     });
 
     test("Return 403 for missing token", async () => {
-      // TODO Implement me!
       const id = order._id;
       const response = await request.get(`${endpoint}/${id}`);
       expect(response.status).toBe(403);
     });
 
     test("Return 403 for invalid token", async () => {
-      // TODO Implement me!
       const id = order._id;
       const response = await request
           .get(`${endpoint}/${id}`)
@@ -306,7 +302,6 @@ describe(`Test ${endpoint} endpoints`, () => {
     test("Return 403 for unauthorized token", async () => {
       // An admin can see any order, however a customer should not be allowed to
       //  see other customers' orders
-      // TODO Implement me!
       const id = order._id;
       const response = await request
           .get(`${endpoint}/${id}`)
@@ -315,7 +310,6 @@ describe(`Test ${endpoint} endpoints`, () => {
     });
 
     test("Return 403 for expired token", async () => {
-      // TODO Implement me!
       const id = order._id;
       const response = await request
           .get(`${endpoint}/${id}`)
@@ -325,7 +319,6 @@ describe(`Test ${endpoint} endpoints`, () => {
 
     describe("Return 200 and the order for successful request", () => {
       test("Admin can see any order", async () => {
-        // TODO Implement me!
         const id = order._id;
         const response = await request
             .get(`${endpoint}/${id}`)
@@ -335,7 +328,6 @@ describe(`Test ${endpoint} endpoints`, () => {
       });
 
       test("Customer can see their order only", async () => {
-        // TODO Implement me!
         const id = order._id;
         const response = await request
             .get(`${endpoint}/${id}`)
@@ -415,7 +407,7 @@ describe(`Test ${endpoint} endpoints`, () => {
       const response = await request
           .post(endpoint)
           .send({
-                customer: mongoose.Types.ObjectId().toString(),
+                customer: productList,
                 products: {
                   quantity: 3,
                   product: productList[1],
@@ -460,8 +452,7 @@ describe(`Test ${endpoint} endpoints`, () => {
           .send({
                 customer: user,
                 products: [{
-                  quantity: "hello",
-                  product: mongoose.Types.ObjectId().toString(),
+                  quantity: 7,
                 },],
               }
           )
@@ -610,7 +601,7 @@ describe(`Test ${endpoint} endpoints`, () => {
 
     test("Return 400 for invalid quantity attribute", async () => {
       const response = await request
-          .put(endpoint)
+          .put(`${endpoint}/${order._id}`)
           .send({
                 products: [{
                   quantity: 1.1,

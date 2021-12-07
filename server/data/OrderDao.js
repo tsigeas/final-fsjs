@@ -1,48 +1,57 @@
-// TODO: Implement the operations of OrderDao.
-//  Do not change the signature of any of the operations!
-//  You may add helper functions, other variables, etc, as the need arises!
+
 const ApiError = require("../model/ApiError");
 const Order = require("../model/Order");
 const mongoose = require("mongoose");
 
 class OrderDao {
-  // When an order is created, it is in "active" state
+// When an order is created, it is in "active" state
   async create({ customer, products }) {
     // Hint: Total price is computer from the list of products.
-
     // check valid customer
-    if(customer === undefined || customer === "") {
+    if(customer === undefined) {
       throw new ApiError(400, "Return 400 for missing customer");
     }
-    if (products === undefined || products === "") {
+    if (products === undefined) {
       throw new ApiError(400, "Return 404 for non-existing product attribute");
     }
-
     if(!customer || !mongoose.isValidObjectId(customer)) {
       throw new ApiError(404, "Return 404 for non-existing customer");
     }
-
     let total = 0;
     products.forEach((product) => {
-      if (!mongoose.isValidObjectId(product.product._id)) {
-        throw new ApiError(404, "Return 404 for non-existing customer");
+      if (product.product === undefined) {
+        throw new ApiError(404, "Return 404 for non-existing product attribute");
       }
-      if (!Number.isInteger(product.quantity)) {
+      if ( !mongoose.isValidObjectId(product.product)) {
+        throw new ApiError(400, "Return 404 for non-existing product attribute");
+      }
+      if ( product.quantity === undefined || !Number.isInteger(product.quantity)) {
         throw new ApiError(400, "Return 400 for invalid quantity attribute");
       }
-
       total += product.product.price * product.quantity;
     });
-    
     const order = await Order.create({total, customer, products});
-    
+
     return {
       _id: order._id.toString(),
       status: order.status,
       total: order.total,
       customer: order.customer,
-      product: order.product,
+      products: order.products,
     };
+  }
+
+  async getOrder(id, adminAccess, customer, role) {
+    const order = await Order.findById(id).lean().select("-__v");
+    if (order === null) {
+      throw new ApiError(404, "Return 404 for invalid order ID");
+    }
+    if (adminAccess && role !== "ADMIN" && order.customer.toString() !== customer){
+      throw new ApiError(403, "Return 403 for unauthorized token");
+    } else if (!adminAccess && order.customer.toString() !== customer) {
+      throw new ApiError(403, "Return 403 for unauthorized token");
+    }
+    return order;
   }
 
   async read(id, customer, role) {
@@ -58,51 +67,80 @@ class OrderDao {
     if (order === null) {
       throw new ApiError(404, "Return 404 for invalid order ID");
     }
-
-    if (role !== "ADMIN" && order.customer._id !== customer._id) {
+    if (role !== "ADMIN" && order.customer.toString() !== customer) {
       throw new ApiError(403, "Return 403 for unauthorized token");
     }
-
     return order;
   }
-
-  // Pre: The requester is an ADMIN or is the customer!
-  //  The route handler must verify this!
+// Pre: The requester is an ADMIN or is the customer!
+//  The route handler must verify this!
   async readAll({ customer, status }) {
     // Hint:
     //  The customer and status parameters are filters.
     //  For example, one may search for all "ACTIVE" orders for the given customer.
-    if(customer) {
 
+    let orders = await Order.find({}).lean().select("-__v");
+
+    if (customer) {
+      orders = orders.filter((order) =>
+          order.customer.toString() === customer
+      );
     }
-    let orders = await Order.find({customer, status}).lean().select("-__v");
+    if (status) {
+      orders = orders.filter((order) =>
+          order.status === status
+      );
+    }
     return orders;
   }
 
   async delete(id, customer) {
     // Hint: The customer must be the one who placed the order!
-    if (role !== "ADMIN" && customer._id !== id) {
-      throw new ApiError(403, "Return 403 for unauthorized token");
-    }
-    await this.read(id);
+    await this.getOrder(id, false, customer);
     return Order.findByIdAndDelete(id).lean().select("-__v");
   }
 
-  // One can update the list of products or the status of an order
-  async update(id, customer, { products, status }) {
+// One can update the list of products or the status of an order
+  async update (id, customer, { products, status }) {
     // Hint: The customer must be the one who placed the order!
-    if (role !== "ADMIN" && customer._id !== id) {
+    const order = await Order.findById(id).lean().select("-__v");
+
+    if (order === null) {
+      throw new ApiError(404, "Return 404 for invalid order ID");
+    }
+    if (order.customer.toString() !== customer) {
       throw new ApiError(403, "Return 403 for unauthorized token");
     }
 
-    await this.read(id);
+    const update = {products, status};
+    let total = order.total;
+
+    // check status
+    if (update.status && update.status !== "COMPLETE" && update.status !== "ACTIVE") {
+      throw new ApiError(400, "Return 400 for invalid status attribute");
+    }
+
+    //update total when quantity updated
+    if (update.products !== undefined) {
+      total = 0;
+      update.products.forEach((product) => {
+        if (!mongoose.isValidObjectId(product.product._id)) {
+          throw new ApiError(404, "Return 404 for non-existing customer");
+        }
+        if (product != undefined) {
+          if (!Number.isInteger(product.quantity)) {
+            throw new ApiError(400, "Return 400 for invalid quantity attribute");
+          }
+          total += product.product.price * product.quantity;
+        }
+      });
+    }
 
     return Order.findByIdAndUpdate(
-      id,
-      {products, status},
-      {new: true, runValidators: true}
+        id,
+        {products, status, total},
+        {new: true, runValidators: true}
     ).lean().select("-__v");
   }
 }
-
 module.exports = OrderDao;
