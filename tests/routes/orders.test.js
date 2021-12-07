@@ -113,7 +113,6 @@ describe(`Test ${endpoint} endpoints`, () => {
     });
 
     test("Return 403 for invalid token", async () => {
-      // TODO Implement me!
       const response = await request
           .get(endpoint)
           .set("Authorization", `Bearer ${tokens.invalid}`);
@@ -123,7 +122,6 @@ describe(`Test ${endpoint} endpoints`, () => {
     test("Return 403 for unauthorized token", async () => {
       // An admin can see any order, however a customer should not be allowed to
       //  see other customers' orders
-      // TODO Implement me!
       const response = await request
           .get(endpoint)
           .set("Authorization", `Bearer ${tokens.customer}`);
@@ -131,7 +129,6 @@ describe(`Test ${endpoint} endpoints`, () => {
     });
 
     test("Return 403 for expired token", async () => {
-      // TODO Implement me!
       const response = await request
           .get(endpoint)
           .set("Authorization", `Bearer ${tokens.expiredAdmin}`);
@@ -155,7 +152,6 @@ describe(`Test ${endpoint} endpoints`, () => {
     describe(`Test GET ${endpoint} with query parameter`, () => {
       describe("Admin can see any order", () => {
         test("Return 200 and the order for a given customer", async () => {
-          // TODO Implement me!
           const customer = samples[1].customer;
           const response = await request
               .get(`${endpoint}?customer=${customer}`)
@@ -176,7 +172,6 @@ describe(`Test ${endpoint} endpoints`, () => {
         });
 
         test("Return 200 and the orders with status of COMPLETE", async () => {
-          // TODO Implement me!
           const status = "COMPLETE";
           const response = await request
               .get(`${endpoint}?status=${status}`)
@@ -189,7 +184,6 @@ describe(`Test ${endpoint} endpoints`, () => {
 
       describe("Customer can see their order(s)", () => {
         test("Return 200 and the order for a given customer", async () => {
-          // TODO Implement me!
           const customer = samples[1].customer;
           const customerToken = await createToken(customer);
           const response = await request
@@ -201,7 +195,6 @@ describe(`Test ${endpoint} endpoints`, () => {
         });
 
         test("Return 200 and this customer's orders with status of ACTIVE", async () => {
-          // TODO Implement me!
           const status = "ACTIVE";
           const customer = samples[1].customer;
           const customerToken = await createToken(customer);
@@ -214,7 +207,6 @@ describe(`Test ${endpoint} endpoints`, () => {
         });
 
         test("Return 200 and this customer's orders with status of COMPLETE", async () => {
-          // TODO Implement me!
           const status = "COMPLETE";
           const customer = samples[1].customer;
           const customerToken = await createToken(customer);
@@ -228,7 +220,6 @@ describe(`Test ${endpoint} endpoints`, () => {
       });
 
       test("Return 200 and an empty list for orders with invalid customer query", async () => {
-        // TODO Im
         const customer = undefined;
         const response = await request
             .get(`${endpoint}?customer=${customer}`)
@@ -249,11 +240,11 @@ describe(`Test ${endpoint} endpoints`, () => {
       });
     });
 
-    // afterAll(async () => {
-    //   for (const sample of samples) {
-    //     await orders.delete(sample._id);
-    //   }
-    // });
+    afterAll(async () => {
+      for (const sample of samples) {
+        await orders.delete(sample._id);
+      }
+    });
 
   });
 
@@ -324,7 +315,6 @@ describe(`Test ${endpoint} endpoints`, () => {
             .get(`${endpoint}/${id}`)
             .set("Authorization", `Bearer ${tokens.admin}`);
         expect(response.status).toBe(200);
-        //expect(response.body.data).toStrictEqual(order);
       });
 
       test("Customer can see their order only", async () => {
@@ -337,11 +327,11 @@ describe(`Test ${endpoint} endpoints`, () => {
       });
     });
 
-    // afterAll(async () => {
-    //   await users.delete(user._id);
-    //   await orders.delete(order._id);
+    afterAll(async () => {
+      await users.delete(user._id);
+      await orders.delete(order._id);
 
-    // });
+    });
   });
 
   describe(`Test POST ${endpoint}`, () => {
@@ -371,7 +361,6 @@ describe(`Test ${endpoint} endpoints`, () => {
     });
 
     test("Return 403 for invalid token", async () => {
-      // TODO Implement me!
       const response = await request
           .post(endpoint)
           .send(order)
@@ -502,7 +491,6 @@ describe(`Test ${endpoint} endpoints`, () => {
         customer: user,
         products: productsList,
       });
-
 
       userToken = await createToken(user);
     });
@@ -696,7 +684,6 @@ describe(`Test ${endpoint} endpoints`, () => {
           .delete(`${endpoint}/${samples[0]._id}`)
           .set("Authorization", `Bearer ${token}`);
       expect(response.status).toBe(200);
-      // expect(response.body.data).toStrictEqual(samples[0]);
     });
   });
 
