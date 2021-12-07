@@ -3,10 +3,10 @@
 This repository contains a homework submission.
 
 ```text
-JHED=
-GITHUB_USERNAME=
-GITHUB_REPO=
-HEROKU_APP=
+JHED= tsolomo8
+GITHUB_USERNAME= tsigeas
+GITHUB_REPO= https://github.com/cs280fa21-homework/homework-9-tsigeas.git
+HEROKU_APP= https://github.com/cs280fa21-homework/homework-9-tsigeas.git
 ```
 
 **ADMIN token:**
