@@ -162,7 +162,7 @@ describe(`Test ${endpoint} endpoints`, () => {
               .set("Authorization", `Bearer ${tokens.admin}`);
           const expected = samples.filter((s) => s.customer === customer);
           expect(response.status).toBe(200);
-          //expect(response.body.data).toStrictEqual(expected);
+          // expect(response.body.data).toStrictEqual(expected);
         });
 
         test("Return 200 and the orders with status of ACTIVE", async () => {
@@ -453,6 +453,7 @@ describe(`Test ${endpoint} endpoints`, () => {
                 customer: user,
                 products: [{
                   quantity: 7,
+                  product : mongoose.Types.ObjectId().product,
                 },],
               }
           )
