@@ -333,7 +333,7 @@ describe(`Test ${endpoint} endpoints`, () => {
             .get(`${endpoint}/${id}`)
             .set("Authorization", `Bearer ${userToken}`);
         expect(response.status).toBe(200);
-        //expect(response.body.data._id).toStrictEqual(order._id);
+        expect(response.body.data._id).toStrictEqual(order._id);
       });
     });
 
@@ -368,7 +368,6 @@ describe(`Test ${endpoint} endpoints`, () => {
     test("Return 403 for missing token", async () => {
       const response = await request.post(endpoint).send(order);
       expect(response.status).toBe(403);
-      // TODO Implement me!
     });
 
     test("Return 403 for invalid token", async () => {
@@ -381,7 +380,6 @@ describe(`Test ${endpoint} endpoints`, () => {
     });
 
     test("Return 403 for expired token", async () => {
-      // TODO Implement me!
       const response = await request
           .post(endpoint)
           .send(order)
@@ -390,7 +388,6 @@ describe(`Test ${endpoint} endpoints`, () => {
     });
 
     test("Return 400 for missing customer", async () => {
-      // TODO Implement me!
       const response = await request
           .post(endpoint)
           .send({
@@ -403,7 +400,6 @@ describe(`Test ${endpoint} endpoints`, () => {
     test("Return 404 for non-existing customer", async () => {
       // A token with a user ID that resembles a valid mongoose ID
       //  however, there is no user in the database with that ID!
-      // TODO Implement me!
       const response = await request
           .post(endpoint)
           .send({
@@ -419,7 +415,6 @@ describe(`Test ${endpoint} endpoints`, () => {
     });
 
     test("Return 400 for missing payload", async () => {
-      // TODO Implement me!
       const response = await request
           .post(endpoint)
           .set("Authorization", `Bearer ${userToken}`);
@@ -428,7 +423,6 @@ describe(`Test ${endpoint} endpoints`, () => {
 
     test("Return 400 for invalid quantity attribute", async () => {
       // Quantity attribute for each product must be a positive value.
-      // TODO Implement me!
       const response = await request
           .post(endpoint)
           .send({
@@ -446,7 +440,6 @@ describe(`Test ${endpoint} endpoints`, () => {
     test("Return 404 for non-existing product attribute", async () => {
       // A product ID that resembles a valid mongoose ID
       //  however, there is no product in the database with that ID!
-      // TODO Implement me!
       const response = await request
           .post(endpoint)
           .send({
@@ -464,7 +457,6 @@ describe(`Test ${endpoint} endpoints`, () => {
 
     test("Return 400 for invalid product attribute", async () => {
       // A product ID that is not even a valid mongoose ID!
-      // TODO Implement me!
       const response = await request
           .post(endpoint)
           .send({
@@ -485,7 +477,6 @@ describe(`Test ${endpoint} endpoints`, () => {
       // Moreover, when an order is placed, its status is ACTIVE.
       // The client only provides the list of products.
       // The API shall calculate the total price!
-      // TODO Implement me!
       const response = await request
           .post(endpoint)
           .send(order)
@@ -517,7 +508,6 @@ describe(`Test ${endpoint} endpoints`, () => {
     });
 
     test("Return 404 for invalid order ID", async () => {
-      // TODO Implement me!
       const response = await request
           .put(`${endpoint}/${mongoose.Types.ObjectId().toString()}`)
           .send({
@@ -528,7 +518,6 @@ describe(`Test ${endpoint} endpoints`, () => {
     });
 
     test("Return 403 for missing token", async () => {
-      // TODO Implement me!
       const response = await request.put(`${endpoint}/${order._id}`).send({
         status: "COMPLETE",
       });
@@ -536,7 +525,6 @@ describe(`Test ${endpoint} endpoints`, () => {
     });
 
     test("Return 403 for invalid token", async () => {
-      // TODO Implement me!
       const response = await request
           .put(`${endpoint}/${order._id}`)
           .send({
@@ -548,7 +536,6 @@ describe(`Test ${endpoint} endpoints`, () => {
 
     describe("Return 403 for unauthorized token", () => {
       test("Admins not allowed to update others' orders", async () => {
-        // TODO Implement me!
         const response = await request
             .put(`${endpoint}/${order._id}`)
             .send({
@@ -559,7 +546,6 @@ describe(`Test ${endpoint} endpoints`, () => {
       });
 
       test("Customers not allowed to update others' orders", async () => {
-        // TODO Implement me!
         const response = await request
             .put(`${endpoint}/${order._id}`)
             .send({
@@ -571,7 +557,6 @@ describe(`Test ${endpoint} endpoints`, () => {
     });
 
     test("Return 403 for expired token", async () => {
-      // TODO Implement me!
       const response = await request
           .put(`${endpoint}/${order._id}`)
           .send({
@@ -582,7 +567,6 @@ describe(`Test ${endpoint} endpoints`, () => {
     });
 
     test("Return 400 for missing payload", async () => {
-      // TODO Implement me!
       const response = await request
           .put(`${endpoint}/${order._id}`)
           .set("Authorization", `Bearer ${tokens.customer}`);
@@ -590,7 +574,6 @@ describe(`Test ${endpoint} endpoints`, () => {
     });
 
     test("Return 400 for invalid status attribute", async () => {
-      // TODO Implement me!
       const response = await request
           .put(`${endpoint}/${order._id}`)
           .send({
@@ -616,7 +599,6 @@ describe(`Test ${endpoint} endpoints`, () => {
 
     describe("Return 200 and the updated order for successful request", () => {
       test("Update products, e.g., add/remove or change quantity", async () => {
-        // TODO Implement me!
         productsList[0] = {
           quantity: 9,
           product: productList[1],
@@ -633,7 +615,6 @@ describe(`Test ${endpoint} endpoints`, () => {
       });
 
       test("Update status, e.g., from ACTIVE to COMPLETE", async () => {
-        // TODO Implement me!
         const response = await request
             .put(`${endpoint}/${order._id}`)
             .send({
@@ -667,7 +648,6 @@ describe(`Test ${endpoint} endpoints`, () => {
     });
 
     test("Return 404 for invalid order ID", async () => {
-      // TODO Implement me!
       const response = await request
           .delete(`${endpoint}/${mongoose.Types.ObjectId().toString()}`)
           .set("Authorization", `Bearer ${tokens.admin}`);
@@ -675,13 +655,11 @@ describe(`Test ${endpoint} endpoints`, () => {
     });
 
     test("Return 403 for missing token", async () => {
-      // TODO Implement me!
       const response = await request.delete(`${endpoint}/${samples[0]._id}`);
       expect(response.status).toBe(403);
     });
 
     test("Return 403 for invalid token", async () => {
-      // TODO Implement me!
       const response = await request
           .delete(`${endpoint}/${samples[0]._id}`)
           .set("Authorization", `Bearer ${tokens.invalid}`);
@@ -690,7 +668,6 @@ describe(`Test ${endpoint} endpoints`, () => {
 
     describe("Return 403 for unauthorized token", () => {
       test("Admins not allowed to delete others' orders", async () => {
-        // TODO Implement me!
         const response = await request
             .delete(`${endpoint}/${samples[1]._id}`)
             .set("Authorization", `Bearer ${tokens.admin}`);
@@ -698,7 +675,6 @@ describe(`Test ${endpoint} endpoints`, () => {
       });
 
       test("Customers not allowed to delete others' orders", async () => {
-        // TODO Implement me!
         const response = await request
             .delete(`${endpoint}/${samples[0]._id}`)
             .set("Authorization", `Bearer ${tokens.customer}`);
@@ -707,7 +683,6 @@ describe(`Test ${endpoint} endpoints`, () => {
     });
 
     test("Return 403 for expired token", async () => {
-      // TODO Implement me!
       const response = await request
           .delete(`${endpoint}/${samples[0]._id}`)
           .set("Authorization", `Bearer ${tokens.expiredAdmin}`);
@@ -716,13 +691,12 @@ describe(`Test ${endpoint} endpoints`, () => {
 
     test("Return 200 and the deleted order for successful request", async () => {
       // A customer may delete their order!
-      // TODO Implement me!
       const token = await createToken(samples[0].customer);
       const response = await request
           .delete(`${endpoint}/${samples[0]._id}`)
           .set("Authorization", `Bearer ${token}`);
       expect(response.status).toBe(200);
-      //expect(response.body.data).toStrictEqual(samples[0]);
+      // expect(response.body.data).toStrictEqual(samples[0]);
     });
   });
 

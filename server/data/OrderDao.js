@@ -1,6 +1,11 @@
 
 const ApiError = require("../model/ApiError");
 const Order = require("../model/Order");
+const UserDao = require("../../server/data/UserDao");
+const ProductDao = require("../../server/data/ProductDao");
+const userDao = new UserDao();
+const productDao = new ProductDao();
+
 const mongoose = require("mongoose");
 
 class OrderDao {
@@ -17,6 +22,9 @@ class OrderDao {
     if(!customer || !mongoose.isValidObjectId(customer)) {
       throw new ApiError(404, "Return 404 for non-existing customer");
     }
+
+    await userDao.read(customer);
+
     let total = 0;
     products.forEach((product) => {
       if (product.product === undefined) {
@@ -123,17 +131,17 @@ class OrderDao {
     //update total when quantity updated
     if (update.products !== undefined) {
       total = 0;
-      update.products.forEach((product) => {
+      for (const product of update.products) {
         if (!mongoose.isValidObjectId(product.product._id)) {
           throw new ApiError(404, "Return 404 for non-existing customer");
         }
-        if (product != undefined) {
-          if (!Number.isInteger(product.quantity)) {
-            throw new ApiError(400, "Return 400 for invalid quantity attribute");
-          }
-          total += product.product.price * product.quantity;
+        await productDao.read(product.product);
+
+        if (!Number.isInteger(product.quantity)) {
+          throw new ApiError(400, "Return 400 for invalid quantity attribute");
         }
-      });
+        total += product.product.price * product.quantity;
+      }
     }
 
     return Order.findByIdAndUpdate(
